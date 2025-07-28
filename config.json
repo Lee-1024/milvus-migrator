@@ -1,0 +1,19 @@
+{ 
+  "source": {
+    "host": "http://10.40.0.86",
+    "port": 19530,
+    "username": "",
+    "password": "",
+    "database": "test_db"
+  },
+  "target": {
+    "host": "http://10.50.56.243",
+    "port": 19530,
+    "username": "",
+    "password": "",
+    "database": "test_db"
+   },
+  "collections": ["test","test2"],
+  "batch_size": 1000,
+  "parallel_workers": 1
+}
