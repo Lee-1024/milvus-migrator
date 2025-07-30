@@ -518,4 +518,3 @@ func main() {
 	duration := time.Since(start)
 	log.Printf("[DEBUG] 迁移完成，总耗时: %v", duration)
 }
-
