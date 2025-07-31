@@ -1,1 +1,129 @@
-go run main.go -config config.json
+# Milvus 数据迁移工具 (Milvus Migrator)
+这是一个用于在不同 Milvus 数据库实例之间迁移数据的工具。它支持将一个 Milvus 实例中的 collections、schema、索引和数据迁移到另一个 Milvus 实例。
+
+## 功能特性
+- 支持多种连接协议：HTTP、HTTPS、TCP、TCPS
+- 支持 TLS 加密连接
+- 支持用户名/密码认证
+- 支持指定数据库名称
+- 支持迁移指定的 collections 或全部 collections
+- 支持批量数据迁移，可配置批次大小
+- 支持并行工作线程数配置
+- 详细的日志输出，便于调试和监控迁移过程
+## 安装
+### 前提条件
+- Go 1.24 或更高版本
+- 源和目标 Milvus 实例可访问
+### 编译
+```
+git clone https://github.com/yourusername/
+milvus-migrator.git
+cd milvus-migrator
+go build -o milvus-migrator
+```
+## 配置
+迁移工具使用 JSON 格式的配置文件。你可以使用 -generate-config 参数生成一个示例配置文件：
+
+```
+./milvus-migrator -generate-config 
+-config=my-config.json
+```
+### 配置文件示例
+```
+http配置:
+{ 
+  "source": {
+    "host": "http://10.40.0.86",
+    "port": 19530,
+    "username": "",
+    "password": "",
+    "database": "test_db"
+  },
+  "target": {
+    "host": "http://10.50.56.243",
+    "port": 19530,
+    "username": "",
+    "password": "",
+    "database": "test_db"
+   },
+  "collections": ["test","test2"],
+  "parallel_workers": 1
+}
+https配置
+{ 
+  "source": {
+    "host": "http://10.40.0.86",
+    "port": 19530,
+    "username": "",
+    "password": "",
+    "database": "test_db"
+  },
+  "target": {
+    "host": "https://milvus.com",
+    "port":443,
+    "username": "admin",
+    "password": "123456",
+    "database": "test_db"
+   },
+  "collections": ["test","test2"],
+  "parallel_workers": 1
+}
+```
+### 配置参数说明
+- source : 源 Milvus 实例配置
+  
+  - host : 主机地址，支持 http://、https://、tcp://、tcps:// 前缀
+  - port : 端口号
+  - username : 用户名（如需认证）
+  - password : 密码（如需认证）
+  - database : 数据库名称
+- target : 目标 Milvus 实例配置
+  
+  - host : 主机地址，支持 http://、https://、tcp://、tcps:// 前缀
+  - port : 端口号
+  - username : 用户名（如需认证）
+  - password : 密码（如需认证）
+  - database : 数据库名称
+- collections : 要迁移的 collections 列表，为空则迁移全部
+- batch_size : 每批次迁移的数据量，默认 1000
+- parallel_workers : 并行工作线程数，默认 1
+## 使用方法
+### 基本用法
+```
+./milvus-migrator -config=config.json
+```
+### 指定要迁移的 collections
+你可以通过命令行参数覆盖配置文件中的 collections 设置：
+
+```
+./milvus-migrator -config=config.json 
+-collections="collection1,collection2"
+```
+## 迁移流程
+1. 1.
+   连接源和目标 Milvus 实例
+2. 2.
+   获取源 collection 的 schema
+3. 3.
+   在目标实例创建相同的 collection（如果不存在）
+4. 4.
+   分批查询源 collection 的数据
+5. 5.
+   将数据插入到目标 collection
+6. 6.
+   刷新目标 collection 确保数据持久化
+## 索引管理
+项目包含一个单独的工具 milvus-index 用于管理 Milvus 索引。它可以为不同字段创建自定义索引，支持多种索引类型：
+
+- HNSW 索引
+- IVF Flat 索引
+- 其他 Milvus 支持的索引类型
+## 注意事项
+- 迁移过程中会产生大量日志，便于调试
+- 默认超时时间为 24 小时，适用于大型数据迁移
+- 迁移前建议备份重要数据
+## 依赖
+- github.com/milvus-io/milvus/client/v2 v2.5.5
+
+## 贡献
+欢迎提交 Pull Request 或创建 Issue 来改进这个工具。
